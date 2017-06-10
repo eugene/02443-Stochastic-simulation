@@ -153,50 +153,88 @@ end
 
 """
 Runs test
+
+  e.g. the sequence:
+  0.54,0.67,0.13,0.89,0.33,0.45,0.90,0.01,0.45,0.76,0.82,0.24, 0.17
+  has runs of length 2,2,3,4,1, ...
 """
 function runs_test(X)
-    r = 0
-    runs = []
+    runs = Array{Int}([])
+    current_run = 1
+
     for i = 1:length(X) - 1
-        if X[i+1] < X[i]
-            push!(runs, -1)
+        if X[i+1] >= X[i]
+            current_run += 1
         else
-            push!(runs, 1)
+            push!(runs, current_run)
+            current_run = 1
         end
     end
 
-    for j = 1:length(runs) - 1
-        (runs[j] != runs[j+1]) && (r += 1)
-    end
-
-    r
+    push!(runs, current_run)
+    runs
 end
 
 # julia> length(numbers)
 # 100000000
-# julia> runs_test(numbers)
-# 66660541
+# julia> rt = runs_test(numbers);
+# julia> histogram(rt)
+#             ┌────────────────────────────────────────┐
+#   (1.0,2.0] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 16668406       │
+#   (2.0,3.0] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 20828975 │
+#   (3.0,4.0] │▇▇▇▇▇▇▇▇▇▇▇▇▇ 9165639                   │
+#   (4.0,5.0] │▇▇▇▇ 2640372                            │
+#   (5.0,6.0] │▇ 576363                                │
+#   (6.0,7.0] │ 101552                                 │
+#   (7.0,8.0] │ 15137                                  │
+#   (8.0,9.0] │ 1976                                   │
+#  (9.0,10.0] │ 228                                    │
+# (10.0,11.0] │ 26                                     │
+# (11.0,12.0] │ 3                                      │
+#             └────────────────────────────────────────┘
 
 """
 Runs test evaluator where `n` is the length of the sequens
-and `r` is total number of runs (runs_test function)
+and `r` are the runs (returned by runs_test function above)
 """
-function runs_evaluator(n, r)
-    Z = (r - ((2*n - 1)/3))/sqrt((16*n - 29)/90)
+function runs_evaluator(n, runs)
+    rc = counts(runs)
+    
+    # R vector
+    R = zeros(Int64, 6)
+    R[1:5] = rc[1:5]
+    R[6] = sum(rc[6:end])
 
-    low  = quantile(Normal(), 0.025) 
-    high = quantile(Normal(), 0.975) 
+    # A matrix
+    A = [4529.4  9044.9  13568  18091  22615  27892; 
+         9044.9  18097   27139  36187  45234  55789;
+         13568   27139   40721  54281  67852  83685;
+         18091   36187   54281  72414  90470  111580;
+         22615   45234   67852  90470  113262 139476;
+         27892   55789   83685  111580 139476 172860]
 
-    if Z <= low
-        return "H₀ REJECTED. Z: $(Z)) <= $(low)"
-    elseif Z >= high
+    # B vector
+    B = [1/6, 5/24, 11/120, 19/720, 29/5040, 1/840]
+
+    RR = R - n*B
+
+    Z = ((1/n-6)*(RR')*(A*RR))[1]
+
+    if Z >= quantile(Chisq(6), 0.95)
         return "H₀ REJECTED. Z: $(Z)) >= $(high)"
     else
        return "H₀ ACCEPTED." 
     end
 end
 
+# julia> rt = runs_test(numbers)
+# julia> runs_evaluator(length(numbers), rt)
+# "H₀ ACCEPTED."
+
 #
 # Finally, we run the test for Julia build in random generator, a Me-
 # rsenneTwister.
 #
+# julia> rt = runs_test(rand(10^6))
+# julia> runs_evaluator(10^6, rt)
+# "H₀ ACCEPTED."
