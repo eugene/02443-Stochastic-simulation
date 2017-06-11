@@ -9,7 +9,7 @@ import Base.Collections: enqueue!, dequeue!
 #   • The arrival process is modelled as a Poisson process.
 #   • Choose first the service time distribution as exponential.
 #   • Record the fraction of blocked customers, and a confidence 
-#     interval for this fraction..
+#     interval for this fraction.
 #   • The program should take the offered traffic and the number 
 #     of service units as input parameters.
 #
