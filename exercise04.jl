@@ -35,6 +35,12 @@ import Base.Collections: enqueue!, dequeue!
 # • Make the experiment with a distribution of (your own) choice. 
 #   Remember that the distribution should take only non-negative values.
 
+type Event
+    event_type::Symbol # :arrive or :service
+    unit::Int64        # what unit services this event (if any)
+    time::Float64      # time when this event is scheduled for
+end
+
 type World
     # Arrive distribution (Poisson by default)
     arrive_d::Distribution
@@ -43,7 +49,7 @@ type World
     service_d::Distribution
 
     # Event list (ascending sort)
-    event_list::Collections.PriorityQueue
+    event_list::Collections.PriorityQueue{Event, Float64, Base.Order.ForwardOrdering}
 
     # this will hold the service units and their availability 
     service_units::Vector{Bool}
@@ -57,7 +63,7 @@ type World
     # Some sort of a limit, in this case max number of total customers
     limit::Int64
 
-    function World(; n_service_units = 10, arrive_d = Poisson(), service_d = Exponential(), limit = 10_000)
+    function World(; n_service_units = 10, arrive_d = Poisson(1), service_d = Exponential(8), limit = 10_000)
         self = new()
         self.arrive_d = arrive_d
         self.service_d = service_d
@@ -70,58 +76,49 @@ type World
     end
 end
 
-type Event
-    event_type::Symbol # :arrive or :service
-    unit::Int64        # what unit services this event (if any)
-    time::Float64      # time when this event is scheduled for
-
-    function Event(event_type::Symbol, world::World; time_offset = 0.0, unit = 0)
-        target_time = begin
-            if event_type == :arrive; quantile(world.arrive_d, rand())
-            else                      quantile(world.service_d, rand()) end    
-        end
-        
-        self = new()
-        self.event_type = event_type
-        self.unit = unit
-        self.time = time_offset + target_time
-        self
+function Event(event_type::Symbol, world::World; time_offset = 0.0, unit = 0)
+    target_time = begin
+        if event_type == :arrive; quantile(world.arrive_d, rand())
+        else                      quantile(world.service_d, rand()) end    
     end
+
+    Event(event_type, unit, time_offset + target_time)
 end
 
-event_handlers = Dict(
-    :arrive  => function(world, event)
-        # return if we reached the limit of customers served
-        world.n_served >= world.limit && return
+function handle_arrive(world, event)
+    # return if we reached the limit of customers served
+    world.n_served >= world.limit && return
 
-        # enqueue a new arrive event 
-        new_event = Event(:arrive, world, time_offset = event.time)
-        enqueue!(world.event_list, new_event, new_event.time)
-        
-        # any available service units?
-        unit = findfirst(world.service_units)
-        if unit > 0
-            # yay! we had a unit available. let's schedule a 
-            # service event at that unit 
-            service_event = Event(:service, world, time_offset = event.time, unit = unit)
-            enqueue!(world.event_list, service_event, service_event.time)
+    # enqueue a new arrive event 
+    new_event = Event(:arrive, world, time_offset = event.time)
+    enqueue!(world.event_list, new_event, new_event.time)
+    
+    # any available service units?
+    unit = findfirst(world.service_units)
+    if unit > 0
+        # yay! we had a unit available. let's schedule a 
+        # service event at that unit 
+        service_event = Event(:service, world, time_offset = event.time, unit = unit)
+        enqueue!(world.event_list, service_event, service_event.time)
 
-            # and also mark it as being busy
-            world.service_units[unit] = false
-        else
-            # no unit available - we update stats by 
-            # incrementing blocked count
-            world.n_blocked += 1
-        end
-    end,
-    :service => function(world, event)
-        # unit is available again
-        world.service_units[event.unit] = true
-
-        # and we update stats
-        world.n_served += 1
+        # and also mark it as being busy
+        world.service_units[unit] = false
+    else
+        # no unit available - we update stats by 
+        # incrementing blocked count
+        world.n_blocked += 1
     end
-)
+
+    nothing
+end
+
+function handle_service(world, event)
+    # unit is available again
+    world.service_units[event.unit] = true
+
+    # and we update stats
+    world.n_served += 1
+end
 
 function simulate(world::World)
     initial_event = Event(:arrive, world)
@@ -129,7 +126,14 @@ function simulate(world::World)
 
     while length(world.event_list) > 0
         event = dequeue!(world.event_list)
-        event_handlers[event.event_type](world, event)
+
+        if event.event_type == :arrive
+            handle_arrive(world, event)
+        elseif event.event_type == :service
+            handle_service(world, event)
+        else
+            error("invalid event type")
+        end
     end
 
     "Served: $(world.n_served), blocked: $(world.n_blocked)"
