@@ -4,8 +4,10 @@
 #   numbers in a histogram (e.g. 10 classes).
 #
 # ⋄ First implement the LCG yourself by experimenting with different values 
-#   of “a”, “b” and “c”.
+#   of `a`, `b` and `c`
+#
 # ⋄ Evaluate the quality of the generators by several statistical tests.
+#
 # ⋄ Then apply a system available generator (e.g. drand48() C, and C++) and 
 #   perform various statistical tests for this also. As a minimum you should 
 #   perform a χ2 test and an UP/DOWN run test. Optional supplementary tests 
@@ -154,9 +156,9 @@ end
 """
 Runs test
 
-  e.g. the sequence:
-  0.54,0.67,0.13,0.89,0.33,0.45,0.90,0.01,0.45,0.76,0.82,0.24, 0.17
-  has runs of length 2,2,3,4,1, ...
+e.g. the sequence:
+0.54,0.67,0.13,0.89,0.33,0.45,0.90,0.01,0.45,0.76,0.82,0.24, 0.17
+has runs of length 2,2,3,4,1,1
 """
 function runs_test(X)
     runs = Array{Int}([])
@@ -216,20 +218,20 @@ function runs_evaluator(n, runs)
     # B vector
     B = [1/6, 5/24, 11/120, 19/720, 29/5040, 1/840]
 
-    RR = R - n*B
+    RR = R - (n*B)
 
-    Z = ((1/n-6)*(RR')*(A*RR))[1]
+    Z = ((1/(n-6))*(RR')*(A*RR))[1]1
 
     if Z >= quantile(Chisq(6), 0.95)
         return "H₀ REJECTED. Z: $(Z)) >= $(high)"
     else
-       return "H₀ ACCEPTED." 
+       return "H₀ ACCEPTED. Z: $(Z)" 
     end
 end
 
 # julia> rt = runs_test(numbers)
 # julia> runs_evaluator(length(numbers), rt)
-# "H₀ ACCEPTED."
+# "H₀ ACCEPTED. Z: 3.921863952535216"
 
 #
 # Finally, we run the test for Julia build in random generator, a Me-
@@ -237,4 +239,6 @@ end
 #
 # julia> rt = runs_test(rand(10^6))
 # julia> runs_evaluator(10^6, rt)
-# "H₀ ACCEPTED."
+# "H₀ ACCEPTED. 2.2520875357046912"
+#
+# Which passes our test.

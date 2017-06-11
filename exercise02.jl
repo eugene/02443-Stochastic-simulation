@@ -211,8 +211,8 @@ end
 #   All three methods were implemented, and for a given discrete distribution 
 #   and n = 10000, we have obtained following results:
 #
-#     crude method:      0.059389 seconds (359.96 k allocations: 12.352 MB)      
-#     rejection method:  0.038120 seconds (267.05 k allocations: 6.618 MB) 
-#     alias method:      0.006826 seconds (109.04 k allocations: 2.352 MB)
+#     Crude method:      0.059389 seconds (359.96 k allocations: 12.352 MB)      
+#     Rejection method:  0.038120 seconds (267.05 k allocations: 6.618 MB) 
+#     Alias method:      0.006826 seconds (109.04 k allocations: 2.352 MB)
 #
-#   Which matched our expectation.
+#   Which matched our expectations.
