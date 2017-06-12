@@ -1,3 +1,5 @@
+srand(0)
+
 using UnicodePlots
 using StatsBase
 using Distributions
@@ -69,7 +71,6 @@ function sim()
         uᵢ  = rand()
         y   = (findfirst(e -> uᵢ < e, cumsum(row))) - 1
         MH  = min(1, (g(y)*(H[y+1, x+1])) / (g(x)*(H[x+1, y+1])))
-            # min(1, g(y) / g(x))
 
         if rand() < MH
             push!(X, y)
@@ -99,7 +100,9 @@ end
 function chisq(X)
     expected = result * runs
     observed = counts(X)
-    T_val    = sum((observed - expected).^2 ./ expected)
+
+    T_val    = sum(((observed - expected).^2) ./ expected)
+    println("T_val: $T_val")
 
     df   = length(i) - 1
     high = quantile(Chisq(df), 0.95) 

@@ -225,7 +225,7 @@ function runs_evaluator(n, runs)
     if Z >= quantile(Chisq(6), 0.95)
         return "H₀ REJECTED. Z: $(Z)) >= $(high)"
     else
-       return "H₀ ACCEPTED. Z: $(Z)" 
+        return "H₀ ACCEPTED. Z: $(Z)" 
     end
 end
 

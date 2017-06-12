@@ -49,7 +49,7 @@ include("common.jl")
 # julia> μ  = mean(X)
 # 1.7076722628994312
 #
-# julia> σ² = mean(X.^2) - mean(X)^2
+# julia> σ² = (1/(n-1))*sum((X.-μ).^2)
 # 0.24976235771911126
 #
 #    Now, motivated by central limit theorem, we construct the confidence 
@@ -66,7 +66,7 @@ include("common.jl")
 # julia> μ = mean(Y)
 # 1.7133340205701004
 #
-# julia> σ² = mean(Y.^2) - mean(Y)^2
+# julia> σ² = (1/(n-1))*sum((Y.-μ).^2)
 # 0.13493602945518735
 #
 #   Again, we construct the confidence intervals:
@@ -83,8 +83,8 @@ include("common.jl")
 # julia> μ = mean(Z)
 # 1.7148015195590884
 #
-# julia> σ² = mean(Z.^2) - mean(Z)^2
-# 0.0036891532137888206
+# julia> σ² = (1/(n-1))*sum((Z.-μ).^2)
+# 0.003761952060192394
 #
 #   Confidence intervals:
 #
@@ -94,26 +94,11 @@ include("common.jl")
 # • Estimate the integral ∫₀¹ exp(x) dx using stratified sampling, 
 #   with comparable computer ressources.
 #
+# julia> Wᵢ = sum([exp((i/100)+rand()/100) for i = 0:99])/100
 
-# TODO REWRITE IN JULIA TO USE BROADCAST
-
-k = 10
-
-# julia> a = rand(2,1); A = rand(2,3);
-
-# julia> a
-# 2×1 Array{Float64,2}:
-#  0.951746
-#  0.492025
-
-# julia> A
-# 2×3 Array{Float64,2}:
-#  0.737162  0.0574485  0.336656
-#  0.795871  0.198941   0.2526
-
-# julia> broadcast(+, a, A)
-# 2×3 Array{Float64,2}:
-#  1.68891  1.00919   1.2884
-#  1.2879   0.690966  0.744626
-
-# julia>
+strts = n
+W = [exp((i/strts)+rand()/strts) for i = 0:strts-1]
+μ = mean(Z)
+σ² = (1/(n-1))*sum((W.-μ).^2)
+(μ + √(σ²/n) * quantile(t_d, α/2), μ + √(σ²/n) * quantile(t_d, (1-α/2)))
+(1.618864155240671,1.8150218560345295)
