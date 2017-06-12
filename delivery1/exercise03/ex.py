@@ -62,45 +62,42 @@ plot_CIs_series(var_ci,1,'Variance')
 plt.show()
 
 
+'''
+Chi2 for exponential :
+Critical value: 16.9189776046  chi2-stat: 5.11718121725
+The goodness of fit test has been therefore passed
 
-# Chi2 for exponential :
-# Critical value: 16.9189776046  chi2-stat: 5.11718121725
-# The goodness of fit test has been therefore passed
-#
-# Chi2 normal :
-# Critical value: 16.9189776046  chi2-stat: 8.68033473907
-# The goodness of fit test has been therefore passed
-#
-# Pareto
-# beta= 1 k= 2.05
-# Mean:  1.98359728891  true mean: 1.95238095238
-# Variance:  10.5466676935  true variance: 37.1882086168
-# Critical value: 16.9189776046  chi2-stat: 4.66666666667
-# The goodness of fit test has been therefore passed
-#
-# Pareto
-# beta= 1 k= 2.5
-# Mean:  1.65401648359  true mean: 1.66666666667
-# Variance:  1.65654370423  true variance: 2.22222222222
-# Critical value: 16.9189776046  chi2-stat: 33.2005148005
-# The goodness of fit test has NOT been passed for values higher than k=2.05, altough the overall shape of the distributions is very similar to the desired one
-#
-# Pareto
-# beta= 1 k= 3
-# Mean:  1.5155929964  true mean: 1.5
-# Variance:  1.02151823789  true variance: 0.75
-# Critical value: 16.9189776046  chi2-stat: 361.090036014
-#
-# Pareto
-# beta= 1 k= 4
-# Mean:  1.34085681951  true mean: 1.33333333333
-# Variance:  0.22576177862  true variance: 0.222222222222
-# Critical value: 16.9189776046  chi2-stat: 0.102420484097
-#
-# For 100 95% confidence intervals we expect +-95 of them contain the true value
-# This value can of course vary slightly, and if we count the actual number of interval containing the true mean=0
-# we get 96 for the mean and the variance, which are close to expected values.
-#
-#
-#
-#
+Chi2 normal :
+Critical value: 16.9189776046  chi2-stat: 8.68033473907
+The goodness of fit test has been therefore passed
+
+Pareto
+beta= 1 k= 2.05
+Mean:  1.98359728891  true mean: 1.95238095238
+Variance:  10.5466676935  true variance: 37.1882086168
+Critical value: 16.9189776046  chi2-stat: 4.66666666667
+The goodness of fit test has been therefore passed
+
+Pareto
+beta= 1 k= 2.5
+Mean:  1.65401648359  true mean: 1.66666666667
+Variance:  1.65654370423  true variance: 2.22222222222
+Critical value: 16.9189776046  chi2-stat: 33.2005148005
+The goodness of fit test has NOT been passed for values higher than k=2.05, altough the overall shape of the distributions is very similar to the desired one
+
+Pareto
+beta= 1 k= 3
+Mean:  1.5155929964  true mean: 1.5
+Variance:  1.02151823789  true variance: 0.75
+Critical value: 16.9189776046  chi2-stat: 361.090036014
+
+Pareto
+beta= 1 k= 4
+Mean:  1.34085681951  true mean: 1.33333333333
+Variance:  0.22576177862  true variance: 0.222222222222
+Critical value: 16.9189776046  chi2-stat: 0.102420484097
+
+For 100 95% confidence intervals we expect +-95 of them contain the true value
+This value can of course vary slightly, and if we count the actual number of interval containing the true mean=0
+we get 96 for the mean and the variance, which are close to expected values.
+'''
