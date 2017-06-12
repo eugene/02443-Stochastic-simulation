@@ -14,7 +14,7 @@
 #   are histograms and Ui, Ui+1 plots, test for zero correlation 
 #   and up/down runtest.
 
-include("delivery1/exercise02/common.jl")
+include("common.jl")
 
 # Resets Julia MersenneTwister random number generator
 srand(0) 
@@ -246,17 +246,15 @@ function above_below(r)
 
     T = n1
     dist = Normal(μ, sqrt(σ²))
-    pval = cdf(dist, T)
     lo = quantile(dist, 0.025)
     hi = quantile(dist, 0.975)
 
     # test statistic, pval, and confidence interval
-    (T, pval, lo, hi)
+    (T, lo, hi)
 end
 
-# julia> abt = above_below(numbers)
-# "H₀ ACCEPTED. Z: 3.921863952535216"
-
+# julia> abt = above_below(d)
+# (49996421, 4.999999991163314e7,5.0000001575997226e7)
 
 # We run an above/below test on `numbers`
 
