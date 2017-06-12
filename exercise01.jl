@@ -220,7 +220,7 @@ function runs_evaluator(n, runs)
 
     RR = R - (n*B)
 
-    Z = ((1/(n-6))*(RR')*(A*RR))[1]1
+    Z = ((1/(n-6))*(RR')*(A*RR))[1]
 
     if Z >= quantile(Chisq(6), 0.95)
         return "H₀ REJECTED. Z: $(Z)) >= $(high)"
@@ -242,3 +242,21 @@ end
 # "H₀ ACCEPTED. 2.2520875357046912"
 #
 # Which passes our test.
+
+function above_below(r)
+    n = length(r)
+    n1 = sum(r.>mean(r))
+    n2 = n - n1
+
+    μ = ((2*n1*n2)/(n1+n2))+1;
+    σ² = (2*n1*n2*(2*n1*n2-n1-n2))/((n1+n2)*(n1+n2)*(n1+n2-1));
+
+    T = n1
+    dist = Normal(μ, sqrt(σ²))
+    pval = cdf(dist, T)
+    lo = quantile(dist, 0.025)
+    hi = quantile(dist, 0.975)
+
+    # test statistic, pval, and confidence interval
+    (T, pval, lo, hi)
+end
