@@ -14,7 +14,7 @@
 #   are histograms and Ui, Ui+1 plots, test for zero correlation 
 #   and up/down runtest.
 
-include("common.jl")
+include("delivery1/exercise02/common.jl")
 
 # Resets Julia MersenneTwister random number generator
 srand(0) 
@@ -233,16 +233,9 @@ end
 # julia> runs_evaluator(length(numbers), rt)
 # "H₀ ACCEPTED. Z: 3.921863952535216"
 
-#
-# Finally, we run the test for Julia build in random generator, a Me-
-# rsenneTwister.
-#
-# julia> rt = runs_test(rand(10^6))
-# julia> runs_evaluator(10^6, rt)
-# "H₀ ACCEPTED. 2.2520875357046912"
-#
-# Which passes our test.
-
+"""
+Above/below test given in Conradsen
+"""
 function above_below(r)
     n = length(r)
     n1 = sum(r.>mean(r))
@@ -260,3 +253,19 @@ function above_below(r)
     # test statistic, pval, and confidence interval
     (T, pval, lo, hi)
 end
+
+# julia> abt = above_below(numbers)
+# "H₀ ACCEPTED. Z: 3.921863952535216"
+
+
+# We run an above/below test on `numbers`
+
+# Finally, we run the test for Julia build in random generator, a Me-
+# rsenneTwister.
+#
+# julia> rt = runs_test(rand(10^6))
+# julia> runs_evaluator(10^6, rt)
+# "H₀ ACCEPTED. 2.2520875357046912"
+#
+# Which passes our test.
+
