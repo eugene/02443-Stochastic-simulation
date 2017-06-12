@@ -67,6 +67,40 @@ Geometric_CDF_inv(U; p = 0.5) = floor(log(U)/log(1-p)) + 1
 
 pᵢₛ = [7//48, 5//48, 1//8, 1//16, 1//4, 5//16]
 
+# X² tests:
+
+"""
+T value calculator.  
+"""
+function T(X::Vector)
+    T_acc = 0 # T accomulator 
+
+    bins = countmap(simulation)
+    expected = Dict()
+    for pᵢ ∈ pᵢₛ
+        expected[pᵢ] = Float64(pᵢ * length(X))
+    end
+
+    for (class, actual_value) ∈ bins
+        T_acc += (actual_value - expected[class])^2 / expected[class]
+    end
+
+    T_acc
+end
+
+"""
+Hypothesis evaluator
+"""
+function hypo_eval(T_val, df)
+    high = quantile(Chisq(df), 0.95) 
+
+    if T_val >= high
+        return "H₀ REJECTED. T($(T_val)) >= $(high)"
+    else
+        return "H₀ ACCEPTED."
+    end
+end
+
 """
 Crude method. 
 
@@ -94,6 +128,11 @@ end
 # (0.24,0.26] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2546       │ (pᵢ = 1/4)
 #  (0.3,0.32] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 3120 │ (pᵢ = 5/16)
 #             └────────────────────────────────────────┘
+#
+# X² square:
+#
+# julia> hypo_eval(T(simulation), length(pᵢₛ)-1)
+# "H₀ ACCEPTED."
 #
 # Benchmark
 # julia> @time [crude() for i = 1:10_000]
@@ -171,7 +210,11 @@ end
 # (0.24,0.26] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2490        │ (pᵢ = 1/4)
 #  (0.3,0.32] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 3101 │ (pᵢ = 5/16)
 #             └────────────────────────────────────────┘
-# 
+# X² square:
+#
+# julia> hypo_eval(T(simulation), length(pᵢₛ)-1)
+# "H₀ ACCEPTED."
+#
 # Benchmark:
 # julia> @time alias(10_000)
 #   0.006826 seconds (109.04 k allocations: 2.352 MB)
@@ -201,12 +244,18 @@ end
 #  (0.3,0.32] │▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 3087 │ (pᵢ = 5/16)
 #             └────────────────────────────────────────┘
 #
+# X² square:
+#
+# julia> hypo_eval(T(simulation), length(pᵢₛ)-1)
+# "H₀ ACCEPTED."
+#
 # Benchmark:
 # julia> @time [rejection() for i = 1:10_000]
 #   0.038120 seconds (267.05 k allocations: 6.618 MB) 
 # Comment: that's 2 times faster than crude() method.
 
-# Results:
+
+# Benchmark results:
 # 
 #   All three methods were implemented, and for a given discrete distribution 
 #   and n = 10000, we have obtained following results:
