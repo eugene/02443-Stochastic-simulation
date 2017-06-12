@@ -109,3 +109,9 @@ function chisq(X)
 
     return T_val <= high
 end
+
+# Note:
+#
+# The simulated results did not pass the Chi² test half of the time,
+# but this is expected as Chi² test assumes variable independence.
+#
